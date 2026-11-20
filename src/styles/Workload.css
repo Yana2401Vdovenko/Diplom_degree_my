@@ -777,12 +777,12 @@ html, body {
 }
 
 /* --- ЗАГАЛЬНІ СТИЛІ КЛАСІВ ТАБЛИЦЬ --- */
-.text-center { 
-  text-align: center !important; 
+.text-center {
+  text-align: center !important;
   vertical-align: middle;
 }
-.text-right { 
-  text-align: right !important; 
+.text-right {
+  text-align: right !important;
 }
 .font-bold { font-weight: 700; }
 .font-medium { font-weight: 500; }
@@ -849,6 +849,14 @@ html, body {
 
 .btn-import-workload { background-color: #f1f5f9; color: #334155; border: 1px solid var(--border-color); }
 .btn-import-workload:hover { background-color: #e2e8f0; }
+
+.workload-import-spinner {
+  animation: workload-spin 0.9s linear infinite;
+}
+
+@keyframes workload-spin {
+  to { transform: rotate(360deg); }
+}
 
 .import-file-notice {
   margin: -7px 0 0;
@@ -1013,33 +1021,1320 @@ html, body {
 
 /* --- СТИЛІ ДЛЯ КОРЕКТНОГО ДРУКУ (PDF) --- */
 @media print {
-  .sidebar, 
-  .main-header, 
-  .window-tabs-navigation, 
-  .video-selectors-bar, 
-  .card-window-header button, 
+  .sidebar,
+  .main-header,
+  .window-tabs-navigation,
+  .video-selectors-bar,
+  .card-window-header button,
   .metrics-grid {
     display: none !important;
   }
-  
+
   .dashboard-container {
     display: block !important;
     background: #ffffff !important;
   }
-  
+
   .main-content {
     padding: 0 !important;
     height: auto !important;
     overflow: visible !important;
   }
-  
+
   .custom-card-window {
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
   }
-  
+
   .printable-report-sheet {
     border: none !important;
   }
+}
+/* The workload allocation grid owns its own scrolling and fullscreen geometry. */
+.main-content .custom-card-window.workload-distribution-card {
+  flex: 1 1 auto;
+  max-height: none !important;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 16px;
+  overflow: hidden !important;
+}
+
+.main-content .custom-card-window.workload-distribution-card.workload-fullscreen-card {
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-shell .main-content > .custom-card-window {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.workload-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  min-height: 520px;
+  max-height: 62vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+.workload-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: bottom;
+}
+
+.workload-table-scroll thead th.workload-hour-header {
+  height: 115px;
+  padding: 10px 6px !important;
+  font-size: 12px !important;
+  text-align: center !important;
+}
+
+.workload-table-scroll thead th.workload-hour-header > span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.workload-fullscreen-card {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  z-index: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 18px !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+}
+
+.workload-fullscreen-shell .workload-fullscreen-card {
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-card .workload-table-scroll {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+/* Shared scrolling and high-contrast table presentation for every workload tab. */
+.dashboard-container {
+  overflow: visible;
+}
+
+.dashboard-container > .main-content {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.workload-tab-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+}
+
+.workload-tab-toolbar strong {
+  font-size: 15px;
+}
+
+.workload-tab-toolbar button,
+.workload-fullscreen-tab-bar button {
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.workload-fullscreen-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 50 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: #f8fafc !important;
+}
+
+.workload-fullscreen-shell .main-content {
+  min-height: 0 !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-tab-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  margin: -4px 56px 8px 0;
+  padding: 4px 0 8px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.workload-fullscreen-tab-bar strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.workload-fullscreen-card {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: calc(100vh - 24px) !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+.workload-tab-table-scroll {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 480px;
+  max-height: calc(100vh - 260px);
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  border-radius: 10px;
+}
+
+.main-content .custom-card-window .workload-table-scroll {
+  min-height: 480px !important;
+  max-height: calc(100vh - 260px) !important;
+}
+
+.workload-fullscreen-card .workload-tab-table-scroll {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+.workload-fullscreen-card .workload-table-scroll {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+.workload-form56-scroll {
+  min-height: 480px;
+}
+
+.workload-fullscreen-card .workload-form56-scroll {
+  min-height: 0;
+}
+
+.workload-fullscreen-card .workload-report-document {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.workload-fullscreen-card .workload-report-document .workload-tab-table-scroll {
+  flex: 1 1 auto;
+}
+
+.workload-tab-table-scroll thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.workload-tab-table-scroll tbody td {
+  padding: 12px 8px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #0f172a;
+  font-size: 14px !important;
+}
+
+.workload-tab-table-scroll tbody td strong,
+.workload-tab-table-scroll tbody td .font-bold,
+.workload-tab-table-scroll tbody td .font-semibold {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+.workload-tab-table-scroll tbody td.workload-hour-value {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+.workload-tab-table-scroll tbody td.workload-hour-zero {
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+}
+
+.workload-tab-table-scroll tbody tr {
+  min-height: 44px;
+}
+
+.workload-tab-table-scroll tbody tr:hover {
+  background: #f8fafc;
+}
+
+.workload-report-card > div:first-of-type button {
+  gap: 10px;
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+.btn-import-workload,
+.btn-export,
+.btn-pdf-export {
+  gap: 10px;
+  padding: 8px 16px;
+}
+
+@media (max-width: 720px) {
+  .workload-fullscreen-shell .main-content {
+    padding: 8px !important;
+  }
+
+  .workload-fullscreen-card {
+    padding: 10px !important;
+  }
+
+  .workload-fullscreen-tab-bar {
+    margin-right: 52px;
+  }
+
+  .workload-tab-table-scroll {
+    min-height: 420px;
+  }
+}
+
+.workload-limit-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.workload-report-print-header,
+.workload-report-print-signatures {
+  display: none;
+}
+
+@media print {
+  .workload-report-print-header {
+    display: block;
+    margin-bottom: 16px;
+    text-align: center;
+    font-family: "Times New Roman", serif;
+    font-weight: 600;
+  }
+
+  .workload-report-print-header p {
+    margin: 0;
+  }
+
+  .workload-report-print-signatures {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 28px;
+    font-family: "Times New Roman", serif;
+    font-size: 12px;
+  }
+
+  .workload-report-screen-signatures {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .workload-limit-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .workload-limit-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.workload-modal-primary:hover {
+  background: #1d4ed8 !important;
+}
+
+.workload-modal-secondary:hover {
+  background: #f9fafb !important;
+}
+
+.workload-modal-auxiliary:hover,
+.workload-modal-split:hover {
+  background: #dbeafe !important;
+}
+
+/* Workload page uses natural page scrolling outside fullscreen. */
+html:has(body.workload-page-active) {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body.workload-page-active {
+  height: auto !important;
+  min-height: 100vh;
+  overflow: visible !important;
+}
+
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) {
+  display: flex;
+  width: 100%;
+  height: auto !important;
+  min-height: 100vh;
+  overflow: visible !important;
+  align-items: stretch;
+}
+
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .main-content {
+  height: auto !important;
+  min-height: 100vh;
+  overflow: visible !important;
+  flex: 1 1 0;
+}
+
+body.workload-page-active .main-content .custom-card-window.workload-distribution-card:not(.workload-fullscreen-card) {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+body.workload-page-active .workload-table-scroll,
+body.workload-page-active .workload-tab-table-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+body.workload-page-active .main-content .custom-card-window .workload-table-scroll {
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+/* Shared fullscreen frame and table scrolling for all five workload tabs. */
+body.workload-fullscreen-active .global-notification-bell {
+  display: none !important;
+}
+
+.workload-fullscreen-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 21000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  padding: 16px 24px !important;
+  overflow: hidden !important;
+  background: #f8fafc !important;
+}
+
+.workload-fullscreen-shell > .main-content {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-shell .workload-fullscreen-card {
+  position: relative !important;
+  inset: auto !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+.workload-fullscreen-shell .workload-fullscreen-tab-bar {
+  flex: 0 0 auto !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  padding: 8px 18px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.workload-fullscreen-tab-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.workload-fullscreen-shell .workload-fullscreen-tab-bar button {
+  margin-right: 0 !important;
+}
+
+.workload-fullscreen-tab-bar .workload-download-report-button {
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+
+.workload-fullscreen-tab-bar .workload-download-report-button:hover {
+  background: #1d4ed8 !important;
+}
+
+.workload-fullscreen-tab-bar button:not(.workload-download-report-button) {
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+.workload-fullscreen-shell .workload-table-scroll,
+.workload-fullscreen-shell .workload-tab-table-scroll {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-bottom: 32px !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.workload-fullscreen-shell .main-content .custom-card-window .workload-table-scroll,
+.workload-fullscreen-shell .main-content .custom-card-window .workload-tab-table-scroll {
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
+.workload-fullscreen-shell .workload-report-document {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+
+.workload-fullscreen-vacancy-total {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #fcd34d;
+  border-radius: 9px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.workload-download-report-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.workload-download-report-button:hover {
+  background: #1d4ed8;
+}
+
+.workload-card-header .workload-download-report-button {
+  height: 36px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+
+.workload-card-header .workload-download-report-button:hover {
+  background: #1d4ed8 !important;
+}
+
+.workload-fullscreen-shell .workload-report-document > .mb-4 {
+  display: none !important;
+}
+
+/* Harmonize workload tabs and keep the regular page background continuous. */
+body.workload-page-active,
+body.workload-page-active .dashboard-container,
+body.workload-page-active .dashboard-container > .main-content {
+  background: #f8fafc !important;
+}
+body.workload-page-active .dashboard-container > .main-content {
+  min-height: 100vh !important;
+}
+body.workload-page-active .main-content .workload-card-header {
+  min-height: 58px !important;
+  padding: 14px 20px !important;
+  align-items: center !important;
+}
+body.workload-page-active .main-content .workload-card-header h2 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+body.workload-page-active .main-content .workload-card-header button,
+body.workload-page-active .main-content .workload-card-header-actions > button {
+  height: 36px !important;
+  border-radius: 8px !important;
+}
+body.workload-page-active .main-content .workload-tab-table-scroll,
+body.workload-page-active .main-content .workload-table-scroll {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+}
+body.workload-page-active .main-content .workload-tab-table-scroll thead th,
+body.workload-page-active .main-content .workload-table-scroll thead th {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 10px 8px !important;
+}
+
+@media (max-width: 720px) {
+  .workload-fullscreen-shell {
+    padding: 8px !important;
+  }
+  .workload-fullscreen-shell .workload-fullscreen-card {
+    border-radius: 10px !important;
+  }
+  .workload-fullscreen-shell .workload-fullscreen-tab-bar {
+    padding: 6px 10px !important;
+  }
+  .workload-fullscreen-shell .workload-fullscreen-tab-bar strong {
+    font-size: 14px;
+  }
+}
+
+.workload-clear-assignments-button,
+.workload-discipline-archive-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  color: #dc2626;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.workload-clear-assignments-button:hover,
+.workload-discipline-archive-button:hover { background: #fef2f2; }
+.workload-card-header .workload-clear-assignments-button,
+.workload-fullscreen-tab-bar .workload-clear-assignments-button {
+  min-height: 36px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #dc2626 !important;
+}
+.workload-card-header .workload-clear-assignments-button:hover,
+.workload-fullscreen-tab-bar .workload-clear-assignments-button:hover { background: #fef2f2 !important; }
+.workload-discipline-add-button,
+.workload-discipline-neutral-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e293b;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.workload-discipline-add-button { border-color: #2563eb; background: #2563eb; color: #fff; font-weight: 600; }
+.workload-discipline-add-button:hover { border-color: #1d4ed8; background: #1d4ed8; }
+.workload-discipline-neutral-button:hover { background: #f8fafc; }
+.workload-discipline-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .48);
+}
+.workload-discipline-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(900px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .24);
+  color: #0f172a;
+}
+.workload-discipline-modal > header,
+.workload-discipline-modal > footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.workload-discipline-modal > header { padding-bottom: 14px; border-bottom: 1px solid #e2e8f0; }
+.workload-discipline-modal > header h3 { margin: 0; font-size: 20px; font-weight: 700; }
+.workload-discipline-modal > header p { margin: 4px 0 0; color: #64748b; font-size: 13px; }
+.workload-discipline-modal > header > button { width: 36px; height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; }
+.workload-discipline-modal label { display: flex; flex-direction: column; gap: 6px; color: #334155; font-size: 13px; font-weight: 600; }
+.workload-discipline-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.workload-discipline-hours-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.workload-discipline-total { margin: 0; text-align: right; color: #1d4ed8; font-size: 16px; font-weight: 700; }
+.workload-discipline-modal > footer { justify-content: flex-end; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+.workload-discipline-modal button:disabled { cursor: not-allowed; opacity: .6; }
+.workload-discipline-modal .workload-discipline-add-button,
+.workload-discipline-modal .workload-discipline-neutral-button,
+.workload-discipline-modal .workload-discipline-archive-button { min-height: 40px; padding: 0 16px; }
+@media (max-width: 620px) {
+  .workload-discipline-form-grid,
+  .workload-discipline-hours-grid { grid-template-columns: 1fr; }
+  .workload-discipline-modal { padding: 18px; }
+}
+
+/* The regular workload page uses document scrolling with a sticky sidebar. */
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  align-items: flex-start !important;
+}
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 100 !important;
+  height: 100vh !important;
+  flex-shrink: 0 !important;
+}
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .main-content {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  padding: 20px 24px !important;
+}
+
+/* Visual baseline shared by all workload tabs: Vacancies-tab density and contrast. */
+.workload-card-header {
+  min-height: 60px !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+.workload-card-header h2 { color: #0f172a !important; font-size: 18px !important; font-weight: 700 !important; }
+.workload-card-header span { color: #64748b !important; font-size: 13px !important; white-space: nowrap !important; }
+.workload-card-header .workload-card-header-actions { gap: 10px !important; align-items: center !important; }
+.workload-card-header .workload-inline-hours-summary { color: #64748b !important; font-size: 13px !important; font-weight: 400 !important; white-space: normal !important; }
+.workload-card-header .workload-inline-hours-summary strong { color: #334155 !important; font-weight: 600 !important; }
+.workload-fullscreen-tab-bar { min-height: 60px !important; padding: 12px 20px !important; }
+.workload-fullscreen-tab-bar > strong { color: #0f172a !important; font-size: 18px !important; font-weight: 700 !important; }
+.workload-fullscreen-tab-bar .workload-fullscreen-tab-actions { gap: 10px !important; align-items: center !important; }
+.workload-fullscreen-tab-bar .workload-fullscreen-tab-actions > button:not(.workload-download-report-button) { height: 36px !important; min-height: 36px !important; margin: 0 !important; padding: 0 14px !important; border-radius: 8px !important; font-size: 13.5px !important; }
+
+.workload-distribution-filters {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  min-height: 0 !important;
+  padding: 10px 16px !important;
+}
+.workload-filter-search {
+  position: relative;
+  display: inline-flex !important;
+  flex: 1 1 240px !important;
+  min-width: 220px !important;
+  align-items: center !important;
+}
+.workload-filter-search > svg { position: absolute; left: 12px; width: 16px; height: 16px; color: #64748b; pointer-events: none; }
+.workload-filter-control {
+  box-sizing: border-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+.workload-filter-search > .workload-filter-control { width: 100% !important; padding-left: 36px !important; }
+.workload-distribution-filters .workload-filter-search > .workload-filter-control { height: 38px !important; min-height: 38px !important; }
+.workload-distribution-filters > select.workload-filter-control { flex: 0 1 190px; min-width: 170px; }
+.workload-filter-pill {
+  box-sizing: border-box;
+  display: inline-flex !important;
+  flex: 0 0 auto;
+  align-items: center !important;
+  justify-content: center;
+  gap: 8px;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.workload-filter-pill.is-active { border-color: #93c5fd !important; background: #eff6ff !important; color: #1d4ed8 !important; }
+.workload-filter-pill input { width: 15px; height: 15px; margin: 0; accent-color: #2563eb; }
+
+.workload-table-scroll,
+.workload-tab-table-scroll {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  overflow-x: auto !important;
+}
+.workload-table-scroll table,
+.workload-tab-table-scroll table { width: 100% !important; }
+.workload-table-scroll thead th,
+.workload-tab-table-scroll thead th {
+  box-sizing: border-box;
+  height: 44px !important;
+  padding: 10px 12px !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+.workload-table-scroll tbody td,
+.workload-tab-table-scroll tbody td {
+  box-sizing: border-box;
+  padding: 12px 12px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+.workload-table-scroll tbody td.workload-hour-value { font-weight: 600 !important; }
+.workload-table-scroll tbody td.workload-hour-zero { color: #94a3b8 !important; font-weight: 400 !important; }
+.workload-form56-scroll { width: 100% !important; max-width: 100% !important; min-width: 0 !important; overflow-x: auto !important; }
+.workload-form56-scroll table { width: 100% !important; min-width: 0 !important; table-layout: auto !important; }
+.workload-form56-scroll thead th { padding: 10px 6px !important; }
+.workload-form56-scroll tbody td { padding: 12px 6px !important; }
+.workload-form56-scroll tfoot td { background: #f1f5f9 !important; color: #0f172a !important; font-size: 14px !important; font-weight: 700 !important; font-variant-numeric: tabular-nums; }
+
+/* Regular workload tables grow naturally; fullscreen keeps its own scroll frame. */
+body.workload-page-active .main-content .custom-card-window:not(.workload-fullscreen-card) {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 20px !important;
+}
+
+body.workload-page-active .workload-table-scroll:not(.is-fullscreen),
+body.workload-page-active .workload-tab-table-scroll:not(.is-fullscreen) {
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.workload-total-hours-header { width: 104px !important; min-width: 104px !important; white-space: nowrap !important; text-align: center !important; }
+
+/* Keep distribution filters in normal document flow, directly above the table. */
+.workload-distribution-filters {
+  position: static !important;
+  z-index: 2;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 12px 20px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+}
+.workload-distribution-filters .workload-filter-search {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  min-width: 240px !important;
+  height: 38px !important;
+  margin: 0 !important;
+}
+.workload-distribution-filters .workload-filter-search > svg {
+  position: absolute !important;
+  top: 50% !important;
+  left: 12px !important;
+  transform: translateY(-50%) !important;
+}
+.workload-distribution-filters .workload-filter-search > input.workload-filter-control {
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 12px 0 36px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+  font-size: 14px !important;
+  box-sizing: border-box !important;
+}
+.workload-distribution-filters > select.workload-filter-control {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 170px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 32px 0 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  font-size: 14px !important;
+  box-sizing: border-box !important;
+}
+.workload-distribution-filters > .workload-filter-pill {
+  position: static !important;
+  flex: 0 0 auto !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+}
+.workload-distribution-card:not(.workload-fullscreen-card) .workload-table-scroll {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 0 12px !important;
+  padding-top: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+/* Keep imported rows inside the available workspace width. */
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) {
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .main-content {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 240px) !important;
+  overflow-x: clip !important;
+  box-sizing: border-box !important;
+}
+body.workload-page-active .workload-distribution-card:not(.workload-fullscreen-card) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+body.workload-page-active .workload-distribution-card:not(.workload-fullscreen-card) .workload-table-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+.workload-distribution-card .workload-actions-cell > button {
+  height: 30px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+.workload-table-scroll thead th.workload-hour-header,
+.workload-table-scroll tbody td.workload-hour-value,
+.workload-table-scroll tbody td.workload-hour-zero {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  padding: 8px 2px !important;
+  text-align: center !important;
+}
+.workload-table-scroll thead th.workload-total-hours-header,
+.workload-table-scroll tbody td.workload-total-hours-cell {
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  padding: 8px 4px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+.workload-table-scroll tbody td.workload-discipline-cell { padding: 8px 8px !important; }
+.workload-table-scroll tbody td.workload-teacher-cell { padding: 6px 5px !important; }
+.workload-table-scroll tbody td.workload-actions-cell { padding: 6px 12px 6px 4px !important; }
+
+/* All five workload tabs use the same flush, unframed table surface. */
+body.workload-page-active .main-content .workload-table-scroll,
+body.workload-page-active .main-content .workload-tab-table-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  overflow-x: auto !important;
+}
+
+body.workload-page-active .main-content .workload-card-header {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body.workload-page-active .main-content .workload-table-scroll th:first-child,
+body.workload-page-active .main-content .workload-table-scroll td:first-child,
+body.workload-page-active .main-content .workload-tab-table-scroll th:first-child,
+body.workload-page-active .main-content .workload-tab-table-scroll td:first-child {
+  padding-left: 24px !important;
+}
+
+body.workload-page-active .main-content .workload-table-scroll th:last-child,
+body.workload-page-active .main-content .workload-table-scroll td:last-child,
+body.workload-page-active .main-content .workload-tab-table-scroll th:last-child,
+body.workload-page-active .main-content .workload-tab-table-scroll td:last-child {
+  padding-right: 24px !important;
+}
+
+body.workload-page-active:not(.workload-fullscreen-active) .main-content .workload-table-scroll,
+body.workload-page-active:not(.workload-fullscreen-active) .main-content .workload-tab-table-scroll {
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+}
+
+.workload-report-document tfoot td {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+  font-weight: 700 !important;
+  font-size: 12.5px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.workload-report-document tfoot td:nth-child(n + 5):nth-child(-n + 15) {
+  font-size: 13.5px !important;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Keep all workload tab headings and their counters visually consistent. */
+.workload-header-title-line {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.workload-card-header > div:first-child:not(.workload-card-header-actions) {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.workload-card-header h2 {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  line-height: 1.25 !important;
+}
+.workload-card-header > div:first-child > span,
+.workload-card-header .workload-header-title-line > span {
+  display: inline;
+  flex: 0 1 auto;
+  min-width: 0;
+  color: #64748b !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  white-space: normal !important;
+}
+.workload-card-header > div:first-child > span strong,
+.workload-card-header .workload-header-title-line > span strong { font-weight: 600; color: #334155; white-space: nowrap; }
+.workload-card-header .workload-card-header-actions { flex: 0 0 auto !important; gap: 8px !important; }
+.workload-card-header .workload-card-header-actions > button { padding-left: 10px !important; padding-right: 10px !important; font-size: 12.5px !important; }
+.workload-card-header .workload-inline-hours-summary { font-size: 12.5px !important; white-space: normal !important; }
+.workload-card-header .workload-inline-hours-summary strong > span { white-space: nowrap; }
+
+@media (max-width: 1360px) {
+  .workload-card-header .workload-header-title-line > span { white-space: normal !important; }
+  .workload-card-header .workload-inline-hours-summary { white-space: normal !important; }
+  .workload-card-header .workload-card-header-actions { flex-wrap: wrap; }
+}
+
+/* The teacher report controls stay in two stable rows. */
+.workload-report-controls { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; }
+.workload-report-teacher-row { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.workload-report-teacher-select {
+  display: block;
+  width: min(320px, 100%);
+  min-width: min(280px, 100%);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+.workload-report-teacher-select > div { margin-top: 4px; }
+.workload-add-assignment-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.workload-add-assignment-button:hover { background: #1d4ed8; }
+.workload-add-assignment-button:disabled { cursor: not-allowed; opacity: .6; }
+.workload-report-filters { width: 100%; gap: 8px !important; padding: 0 !important; border: 0 !important; flex-wrap: wrap !important; }
+.workload-report-filters > label { flex: 0 1 320px !important; min-width: 240px !important; height: 38px !important; }
+.workload-report-filters > label input { font-size: 13px !important; }
+.workload-report-filters > select { height: 38px !important; font-size: 13px !important; }
+.workload-report-reset-slot { display: inline-flex; flex: 0 0 128px; align-items: center; justify-content: flex-end; min-height: 38px; }
+.workload-report-reset-slot[aria-hidden="true"] { visibility: hidden; }
+.workload-report-reset-slot > button { height: 38px !important; font-size: 13px !important; }
+
+/* Fixed column sizing keeps the report actions inside its scrollable table frame. */
+.workload-teacher-report-table-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+.workload-teacher-report-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+.workload-teacher-report-table th,
+.workload-teacher-report-table td {
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th {
+  height: auto !important;
+  padding: 10px 1px !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th:nth-child(2),
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th:nth-child(3),
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th:nth-child(16) {
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th:nth-child(2),
+.workload-teacher-report-table-scroll .workload-teacher-report-table thead th:nth-child(16) {
+  padding: 10px 6px !important;
+  text-align: left !important;
+}
+.workload-teacher-report-table-scroll .workload-teacher-report-table tbody td {
+  padding: 10px 2px !important;
+  font-size: 12.5px !important;
+  text-align: center;
+}
+.workload-teacher-report-table-scroll .workload-teacher-report-table tbody td:nth-child(2),
+.workload-teacher-report-table-scroll .workload-teacher-report-table tbody td:nth-child(16) {
+  padding: 10px 6px !important;
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+.workload-teacher-report-table th:first-child,
+.workload-teacher-report-table td:first-child { padding-left: 4px !important; }
+.workload-teacher-report-table th:last-child,
+.workload-teacher-report-table td:last-child { padding-right: 4px !important; }
+.workload-teacher-report-table td:nth-child(16) { word-break: normal; overflow-wrap: break-word; line-height: 1.35; font-size: 12.5px; }
+.workload-teacher-report-table td:last-child { text-align: center; white-space: nowrap; }
+body.workload-page-active .main-content .workload-teacher-report-table-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+body.workload-page-active .main-content .workload-teacher-report-table-scroll th,
+body.workload-page-active .main-content .workload-teacher-report-table-scroll td {
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+body.workload-page-active .main-content .workload-teacher-report-table-scroll tbody td {
+  padding: 10px 2px !important;
+  font-size: 12.5px !important;
+}
+body.workload-page-active .main-content .workload-teacher-report-table-scroll tbody td:nth-child(2),
+body.workload-page-active .main-content .workload-teacher-report-table-scroll tbody td:nth-child(16) {
+  padding: 10px 6px !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+}
+body.workload-page-active .main-content .workload-teacher-report-table-scroll th:first-child,
+body.workload-page-active .main-content .workload-teacher-report-table-scroll td:first-child { padding-left: 2px !important; }
+body.workload-page-active .main-content .workload-teacher-report-table-scroll th:last-child,
+body.workload-page-active .main-content .workload-teacher-report-table-scroll td:last-child { padding-right: 2px !important; }
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .main-content { max-width: none !important; }
+
+@media (max-width: 900px) {
+  .workload-header-title-line { align-items: baseline; flex-direction: row; gap: 10px; }
+  .workload-report-teacher-select { min-width: min(280px, 100%); }
+  .workload-report-reset-slot { margin-left: auto; }
 }

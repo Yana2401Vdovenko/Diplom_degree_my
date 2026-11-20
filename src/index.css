@@ -6,3 +6,34 @@
 
 body { @apply m-0 bg-slate-50 text-slate-800 antialiased; }
 button, select { font: inherit; }
+
+/* Let regular application pages grow with their content. */
+html,
+body {
+  width: 100%;
+  height: auto !important;
+  min-height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body {
+  background-color: #f1f5f9;
+}
+
+/* Give every data row its own opaque fill so page color cannot show through. */
+table,
+table tbody,
+table tbody tr,
+table tbody td {
+  background-color: #ffffff !important;
+}
+
+table tbody tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+table thead th,
+table tfoot td {
+  background-color: #f8fafc !important;
+}

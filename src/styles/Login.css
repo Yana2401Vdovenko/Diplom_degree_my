@@ -421,5 +421,8 @@ footer {
     line-height: 1.4;
 }
 
+.login-admin-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; margin-top: 14px; padding: 0 14px; border: 1px solid #bfdbfe; border-radius: 9px; background: #eff6ff; color: #1d4ed8; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .15s ease, border-color .15s ease; }
+.login-admin-link:hover { border-color: #93c5fd; background: #dbeafe; }
+
 .role-item { border: 0; font: inherit; text-align: left; cursor: pointer; }
 .btn-login:disabled { opacity: .7; cursor: wait; }

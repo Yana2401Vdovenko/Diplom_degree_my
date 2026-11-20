@@ -1,0 +1,46 @@
+.dashboard-container .main-header .header-right,
+.main-content > header .header-right,
+.teacher-main > header,
+.help-tour > header,
+.department-header {
+  padding-right: 56px;
+  box-sizing: border-box;
+}
+
+.dashboard-empty,
+.dashboard-chart-empty,
+.dashboard-empty-inline {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.dashboard-empty {
+  margin: 0 0 16px;
+  padding: 18px 20px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.dashboard-empty p { margin: 0 0 10px; }
+.dashboard-empty button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 14px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dashboard-chart-empty,
+.dashboard-empty-inline { margin: auto; padding: 20px; text-align: center; }
+.dashboard-year-picker { margin-left: auto; }
+
+@media (max-width: 760px) {
+  .dashboard-container .main-header .header-right,
+  .main-content > header .header-right,
+  .teacher-main > header,
+  .help-tour > header,
+  .department-header { padding-right: 48px; }
+}

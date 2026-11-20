@@ -1,0 +1,904 @@
+/* Stable sidebar + independently scrollable work area on application screens. */
+.app-shell,
+.dashboard-container,
+.teacher-workspace {
+  display: flex !important;
+  align-items: flex-start !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.app-sidebar,
+.dashboard-container > .app-sidebar,
+.teacher-workspace > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 100 !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.app-shell-main,
+.dashboard-container > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.dashboard-container > .main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep the application navigation anchored while the document scrolls naturally. */
+.app-shell,
+.dashboard-container,
+.teacher-workspace {
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  align-items: flex-start !important;
+  background: #f8fafc !important;
+}
+
+/* Final natural-height layout: regular pages scroll to the last content row. */
+html,
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell),
+.dashboard-container:not(.workload-fullscreen-shell),
+.teacher-workspace {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  background-color: #f1f5f9 !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell) > .app-sidebar,
+.dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar,
+.teacher-workspace > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 100 !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  align-self: flex-start !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell) > .main-content,
+.dashboard-container:not(.workload-fullscreen-shell) > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 20px 24px 48px !important;
+  background-color: #f1f5f9 !important;
+}
+
+/* Keep full-screen workload behavior isolated from regular document flow. */
+body.workload-fullscreen-active {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* All regular white cards follow their content instead of clipping it. */
+.custom-card-window:not(.workload-fullscreen-card),
+.workload-report-card:not(.workload-fullscreen-card),
+.workload-distribution-card:not(.workload-fullscreen-card),
+.table-wrapper-card,
+.teacher-card,
+.dashboard-container .detail-card,
+.dashboard-container .metric-card {
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 20px !important;
+}
+
+.workload-tab-table-scroll:not(.is-fullscreen),
+.workload-table-scroll:not(.is-fullscreen),
+.teacher-workspace .teacher-table-wrap,
+.teacher-workspace .table-container {
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .main-content {
+  background-color: #f1f5f9 !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .details-grid {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.workload-table-scroll thead th:nth-child(12) {
+  white-space: nowrap !important;
+}
+
+/* Keep the page-level workspace flat; frame the data surface itself. */
+.custom-card-window.workload-distribution-card,
+.custom-card-window.workload-report-card,
+.teacher-card.teacher-table-card,
+.department-card.department-table-card,
+.dm-card.dm-list,
+.table-wrapper-card.massive-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.custom-card-window.workload-distribution-card > .workload-card-header,
+.custom-card-window.workload-report-card > .workload-card-header,
+.department-table-card > .department-title,
+.dm-card.dm-list > .dm-card-title {
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+
+.workload-distribution-filters {
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+
+.workload-tab-table-scroll,
+.workload-table-scroll,
+.teacher-table-card .teacher-table-wrap,
+.department-table-card .department-table,
+.dm-card.dm-list .dm-table-wrap,
+.massive-table .table-container {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.department-table-card .department-table,
+.dm-card.dm-list .dm-table-wrap,
+.teacher-table-card .teacher-table-wrap,
+.massive-table .table-container {
+  margin-top: 0 !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .details-grid > .detail-card:first-child {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .top-disciplines-list {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  padding: 0 16px !important;
+}
+
+/* Natural-height table surfaces in regular page mode; fullscreen keeps its own scroll area. */
+body:not(.workload-fullscreen-active) .workload-table-scroll,
+body:not(.workload-fullscreen-active) .workload-tab-table-scroll,
+body:not(.workload-fullscreen-active) .teacher-table-wrap,
+body:not(.workload-fullscreen-active) .department-table,
+body:not(.workload-fullscreen-active) .dm-table-wrap,
+body:not(.workload-fullscreen-active) .table-container,
+body:not(.workload-fullscreen-active) .table-wrapper {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+}
+
+@media (max-width: 800px) {
+  .app-shell:not(.workload-fullscreen-shell) > .app-sidebar,
+  .dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar,
+  .teacher-workspace > .app-sidebar {
+    flex-basis: 240px !important;
+    width: 240px !important;
+  }
+}
+
+.app-sidebar,
+.dashboard-container > .app-sidebar,
+.teacher-workspace > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 100 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  flex: 0 0 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+.app-shell-main,
+.dashboard-container > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding: 20px 24px !important;
+  background: #f8fafc !important;
+}
+
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+  align-items: flex-start !important;
+}
+
+body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .main-content {
+  flex: 1 1 0 !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* The distribution table grows naturally in regular mode; only fullscreen scrolls inside. */
+body.workload-page-active .workload-distribution-card:not(.workload-fullscreen-card) .workload-table-scroll {
+  width: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  overflow: visible !important;
+}
+
+.workload-table-scroll thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: #eef2f6 !important;
+}
+
+.workload-table-scroll table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.workload-tab-table-scroll table {
+  min-width: 0 !important;
+}
+
+.workload-tab-table-scroll th.workload-hour-header {
+  min-width: 56px !important;
+  width: 56px !important;
+}
+
+.workload-tab-table-scroll td {
+  min-width: 0;
+}
+
+body.workload-page-active .workload-tab-table-scroll {
+  width: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.workload-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 16px !important;
+}
+
+.workload-kpi-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  height: auto !important;
+  min-height: 54px !important;
+  padding: 10px 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+}
+
+.workload-kpi-card .metric-icon {
+  flex: 0 0 34px;
+  width: 34px !important;
+  height: 34px !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+}
+
+.workload-kpi-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 2px;
+}
+
+.workload-kpi-card p {
+  min-width: 0;
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.workload-kpi-card strong {
+  display: block;
+  color: #0f172a;
+  font-size: 18px !important;
+  font-weight: 700;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.workload-card-header {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.workload-card-header > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workload-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.workload-card-header span {
+  color: #64748b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.workload-card-header button {
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.workload-card-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.workload-inline-fullscreen-button {
+  height: 36px !important;
+  padding: 0 14px !important;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px !important;
+  background: #fff;
+  color: #1e293b;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  cursor: pointer;
+}
+
+.workload-card-header .workload-inline-fullscreen-button {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+.workload-vacancy-assign-button {
+  height: 32px;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+}
+
+.workload-discipline-edit-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.workload-distribution-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 34px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.workload-distribution-filters > label:first-child {
+  flex: 1 1 240px !important;
+  min-width: 220px !important;
+}
+
+.workload-distribution-filters > label:first-child > input {
+  height: 34px !important;
+}
+
+.workload-distribution-filters > select {
+  height: 34px !important;
+}
+
+.workload-table-scroll tbody td {
+  padding: 6px 8px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-right: 1px solid #f1f5f9;
+  vertical-align: middle !important;
+}
+
+.workload-table-scroll tbody tr:hover td {
+  background: #f8fafc !important;
+}
+
+.workload-table-scroll tbody .workload-discipline-cell {
+  min-width: 220px !important;
+  width: 220px !important;
+  max-width: 220px !important;
+}
+
+.workload-discipline-cell > strong {
+  display: block;
+  overflow: hidden;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workload-inline-tags {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.workload-inline-tags > span {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  font-size: 10px !important;
+}
+
+.workload-table-scroll tbody td.workload-hour-zero,
+.workload-table-scroll tbody td.workload-hour-value {
+  width: 42px !important;
+  padding: 6px 4px !important;
+  text-align: center !important;
+}
+
+.workload-teacher-cell {
+  width: 210px !important;
+  min-width: 210px !important;
+}
+
+.workload-teacher-cell select {
+  display: block;
+  width: 100% !important;
+  height: 30px !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+}
+
+.workload-assigned-teachers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  width: 100%;
+}
+
+.workload-assigned-teachers span {
+  max-width: 100%;
+  color: #1d4ed8;
+  font-size: 11px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.workload-actions-cell {
+  width: 110px !important;
+  min-width: 110px !important;
+  padding: 6px 4px !important;
+}
+
+.workload-actions-cell button {
+  height: 28px;
+  padding: 0 7px;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.workload-actions-cell button + button {
+  margin-left: 3px;
+}
+
+.workload-fullscreen-shell .workload-table-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+@media (min-width: 1280px) {
+  .workload-table-scroll:not(.is-fullscreen) {
+    overflow-x: visible !important;
+  }
+
+  .workload-table-scroll:not(.is-fullscreen) table {
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 1279px) {
+  .workload-table-scroll:not(.is-fullscreen) {
+    overflow-x: auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .workload-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.workload-card-header + div {
+  padding: 8px 16px;
+}
+
+/* Workload tabs use the page scroll in the regular layout. */
+body.workload-page-active .main-content .custom-card-window.workload-report-card:not(.workload-fullscreen-card),
+body.workload-page-active .main-content .custom-card-window.workload-distribution-card:not(.workload-fullscreen-card) {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  flex: 0 1 auto !important;
+}
+
+body.workload-page-active .workload-report-card:not(.workload-fullscreen-card) .workload-tab-table-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.workload-report-card:not(.workload-fullscreen-card) .workload-tab-table-scroll {
+  width: calc(100% - 32px) !important;
+  margin: 0 16px 16px !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.workload-report-card:not(.workload-fullscreen-card) .workload-report-document {
+  padding: 8px 16px 16px;
+}
+
+.workload-report-card:not(.workload-fullscreen-card) [aria-label="Контроль ліміту навантаження"] {
+  width: calc(100% - 32px) !important;
+  margin: 0 16px 8px;
+}
+
+.workload-distribution-card:not(.workload-fullscreen-card) .workload-distribution-filters {
+  margin-bottom: 8px;
+}
+
+.workload-distribution-card:not(.workload-fullscreen-card) .workload-card-header + .workload-distribution-filters {
+  margin-bottom: 8px;
+}
+
+.workload-distribution-card:not(.workload-fullscreen-card) .workload-distribution-filters + div:not(.workload-table-scroll) {
+  margin: 0 16px 8px !important;
+}
+
+@media (min-width: 1280px) {
+  body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar {
+    width: 240px !important;
+    flex-basis: 240px !important;
+  }
+
+  body.workload-page-active .dashboard-container:not(.workload-fullscreen-shell) .main-content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+.workload-fullscreen-shell {
+  align-items: stretch !important;
+}
+
+@media (max-width: 800px) {
+  .app-sidebar,
+  .dashboard-container > .app-sidebar,
+  .teacher-workspace > .app-sidebar {
+    flex-basis: 240px !important;
+    width: 240px !important;
+  }
+}
+
+/* Final layout overrides: the browser document is the vertical scroller. */
+.app-shell,
+.dashboard-container,
+.teacher-workspace {
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  align-items: flex-start !important;
+  background: #f8fafc !important;
+}
+.app-sidebar,
+.dashboard-container > .app-sidebar,
+.teacher-workspace > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 100 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  flex: 0 0 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+.app-shell-main,
+.dashboard-container > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding: 20px 24px !important;
+  background: #f8fafc !important;
+}
+
+/* Final natural-height layout: regular pages scroll to the last content row. */
+html,
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell),
+.dashboard-container:not(.workload-fullscreen-shell),
+.teacher-workspace {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  background-color: #f1f5f9 !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell) > .app-sidebar,
+.dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar,
+.teacher-workspace > .app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 100 !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  margin: 0 !important;
+  transform: none !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  align-self: flex-start !important;
+}
+
+.app-shell:not(.workload-fullscreen-shell) > .main-content,
+.dashboard-container:not(.workload-fullscreen-shell) > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 20px 24px 48px !important;
+  background-color: #f1f5f9 !important;
+}
+
+body.workload-fullscreen-active {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.workload-fullscreen-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.custom-card-window:not(.workload-fullscreen-card),
+.workload-report-card:not(.workload-fullscreen-card),
+.workload-distribution-card:not(.workload-fullscreen-card),
+.table-wrapper-card,
+.teacher-card,
+.detail-card,
+.metric-card {
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 20px !important;
+}
+
+.workload-tab-table-scroll:not(.is-fullscreen),
+.workload-table-scroll:not(.is-fullscreen),
+.teacher-table-wrap,
+.table-container {
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .main-content {
+  background-color: #f1f5f9 !important;
+}
+
+.dashboard-container:not(.workload-fullscreen-shell) .details-grid {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.workload-table-scroll thead th:nth-child(12) {
+  white-space: nowrap !important;
+}
+
+@media (max-width: 800px) {
+  .app-shell:not(.workload-fullscreen-shell) > .app-sidebar,
+  .dashboard-container:not(.workload-fullscreen-shell) > .app-sidebar,
+  .teacher-workspace > .app-sidebar {
+    flex-basis: 240px !important;
+    width: 240px !important;
+  }
+}

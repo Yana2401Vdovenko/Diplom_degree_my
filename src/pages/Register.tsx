@@ -1,35 +1,35 @@
 import "../styles/Register.css";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaTimes,
-  FaEnvelope,
-  FaLock,
-  FaPhone,
-  FaEye,
-  FaEyeSlash,
-  FaImage,
-  FaChalkboardTeacher,
-  FaFlask,
-  FaUserTie,
-  FaArrowRight,
-  FaArrowLeft,
-  FaInfoCircle,
-  FaCheckCircle,
-  FaTrashAlt,
-  FaSearch,
-  FaPlus,
-  FaChevronDown,
-  FaUniversity,
-  FaCalendarAlt,
-  FaClock,
-  FaChartBar,
-  FaCogs,
-  FaUser,
-  FaBriefcase,
-  FaShieldAlt,
-  FaUserPlus
+  FaTimes,
+  FaEnvelope,
+  FaLock,
+  FaPhone,
+  FaEye,
+  FaEyeSlash,
+  FaImage,
+  FaChalkboardTeacher,
+  FaFlask,
+  FaUserTie,
+  FaArrowRight,
+  FaArrowLeft,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaTrashAlt,
+  FaSearch,
+  FaChevronDown,
+  FaUniversity,
+  FaCalendarAlt,
+  FaClock,
+  FaChartBar,
+  FaCogs,
+  FaUser,
+  FaBriefcase,
+  FaShieldAlt,
+  FaUserPlus
 } from "react-icons/fa";
+import { supabase } from "../utils/supabaseClient";
 
 type Role = "teacher" | "lab" | "head";
 
@@ -41,55 +41,93 @@ function Register() {
   const [selectedRole, setSelectedRole] = useState<Role>("head");
   const [showPass, setShowPass] = useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Крок 2: Основна інформація
-  const [formData, setFormData] = useState({
-    firstName: "Іван",
-    lastName: "Іваненко",
-    middleName: "Іванович",
-    email: "ivanenko@nubip.edu.ua",
-    phone: "+380 (67) 123-45-67",
-    password: "",
-    confirmPassword: "",
-    interfaceLang: "Українська",
-    avatar: null as File | null
-  });
+  // Дані з БД
+  type DbItem = { code: string; name: string; facultyCode?: string };
+  const [departments, setDepartments] = useState<DbItem[]>([]);
+  const [disciplines, setDisciplines] = useState<DbItem[]>([]);
+  const [faculties, setFaculties] = useState<DbItem[]>([]);
+  const [positions, setPositions] = useState<DbItem[]>([]);
+  const [degrees, setDegrees] = useState<DbItem[]>([]);
+  const [titles, setTitles] = useState<DbItem[]>([]);
+
+  useEffect(() => {
+    const loadRef = (table: string, codeCol: string, nameCol: string, setter: (items: DbItem[]) => void) => {
+      void supabase.from(table).select(`${codeCol}, ${nameCol}`).order(nameCol).then(({ data, error }) => {
+        if (!error) setter(((data ?? []) as unknown as Record<string, unknown>[]).map((r) => ({ code: String(r[codeCol] ?? "").trim(), name: String(r[nameCol] ?? "").trim() })));
+      });
+    };
+    void supabase.from("Кафедра").select("Код_кафедри,Назва_кафедри,Код_факультету_нні").order("Назва_кафедри").then(({ data, error }) => {
+      if (error) return;
+      const rows = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+        code: String(row["Код_кафедри"] ?? "").trim(),
+        name: String(row["Назва_кафедри"] ?? "").trim(),
+        facultyCode: String(row["Код_факультету_нні"] ?? "").trim(),
+      })).filter((row) => row.code);
+      setDepartments(rows);
+      const first = rows[0];
+      if (first) {
+        setTeacherData((current) => ({ ...current, department: current.department || first.code }));
+        setLabData((current) => ({ ...current, department: current.department || first.code }));
+        setHeadData((current) => ({ ...current, department: current.department || first.code, faculty: current.faculty || first.facultyCode || "" }));
+      }
+    });
+    loadRef("Дисципліни", "Код_дисципліни", "Назва_дисципліни", setDisciplines);
+    loadRef("Факультет_ННІ", "Код_факультету_нні", "Назва_факультету_нні", setFaculties);
+    loadRef("Посада", "Код_посади", "Назва_посади", setPositions);
+    loadRef("Статус_викладача", "Код_статусу", "Назва_статусу", setDegrees);
+    loadRef("Тип_викладача", "Код_типу", "Назва_типу", setTitles);
+  }, []);
+
+  // Крок 2: Основна інформація
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    interfaceLang: "Українська",
+    avatar: null as File | null
+  });
 
   // Крок 3: Додаткові дані для Викладача
   const [teacherData, setTeacherData] = useState({
-    degree: "Доктор філософії (PhD)",
-    title: "Доцент",
-    position: "Доцент",
-    department: "Кафедра інформаційних систем та технологій",
-    experience: "10",
-    rate: "1.0",
-    maxLoad: "600",
-    office: "Корпуск 15, каб. 203",
-    workPhone: "+380 (67) 123-45-67"
+    degree: "",
+    title: "",
+    position: "",
+    department: "",
+    experience: "",
+    rate: "1.0",
+    maxLoad: "",
+    office: "",
+    workPhone: ""
   });
 
   // Крок 3: Додаткові дані для Лаборанта
   const [labData, setLabData] = useState({
-    department: "Кафедра інформаційних систем та технологій",
-    laboratory: "Комп'ютерна лабораторія №2",
-    workPhone: "+380 (67) 123 45 67",
-    responsibilities: {
-      equipment: true,
-      network: true,
-      multimedia: false,
-      materials: false
-    }
+    department: "",
+    laboratory: "",
+    workPhone: "",
+    responsibilities: {
+      equipment: false,
+      network: false,
+      multimedia: false,
+      materials: false
+    }
   });
 
   // Крок 3: Додаткові дані для Завідувача кафедри
   const [headData, setHeadData] = useState({
-    department: "Кафедра інформаційних систем та технологій",
-    faculty: "Факультет інформаційних технологій",
-    degree: "Доктор філософії (PhD)",
-    title: "Доцент",
-    workPhone: "+380 (67) 123-45-67",
-    office: "Корпус 15, каб. 203"
+    department: "",
+    faculty: "",
+    degree: "",
+    title: "",
+    workPhone: "",
+    office: ""
   });
 
   // Крок 4: Підтвердження
@@ -126,28 +164,124 @@ function Register() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (currentStep === 1) {
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
-      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-        setErrorMessage("Ви не внесли всі необхідні дані");
-        return;
-      }
-      setErrorMessage("");
-      setCurrentStep(3);
-    } else if (currentStep === 3) {
-      setCurrentStep(4);
-    } else if (currentStep === 4) {
-      if (!agreements.terms || !agreements.privacy || !agreements.accuracy) {
-        setErrorMessage("Необхідно погодитися з усіма умовами");
-        return;
-      }
-      setErrorMessage("");
-      console.log("Успішно надіслано:", { formData, selectedRole, teacherData, labData, headData });
-    }
-  };
+  const handleContinue = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (currentStep === 1) {
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.phone.trim()) {
+        setErrorMessage("Ви не внесли всі необхідні дані");
+        return;
+      }
+      if (!formData.password || formData.password.length < 6) {
+        setErrorMessage("Пароль має містити щонайменше 6 символів");
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setErrorMessage("Паролі не збігаються");
+        return;
+      }
+      setErrorMessage("");
+      setCurrentStep(3);
+    } else if (currentStep === 3) {
+      setCurrentStep(4);
+    } else if (currentStep === 4) {
+      if (!agreements.terms || !agreements.privacy || !agreements.accuracy) {
+        setErrorMessage("Необхідно погодитися з усіма умовами");
+        return;
+      }
+      setErrorMessage("");
+      setSubmitting(true);
+
+      const fullName = `${formData.lastName} ${formData.firstName} ${formData.middleName}`.trim();
+
+      const roleValue = selectedRole === "lab" ? "laborant" : selectedRole;
+      const selectedDepartmentId = (selectedRole === "lab" ? labData.department : selectedRole === "head" ? headData.department : teacherData.department).trim();
+      const selectedDepartment = departments.find((department) => department.code === selectedDepartmentId);
+      if (!selectedDepartmentId) {
+        setSubmitting(false);
+        setErrorMessage("Оберіть кафедру для облікового запису.");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: selectedRole === "lab" ? "Лаборант" : selectedRole === "head" ? "Завідувач кафедри" : "Викладач",
+            role_code: roleValue,
+            phone: formData.phone,
+            department: selectedDepartment?.name ?? "",
+            department_code: selectedDepartmentId,
+            Код_кафедри: selectedDepartmentId,
+            faculty: selectedDepartment?.facultyCode ?? "",
+            Код_факультету_нні: selectedDepartment?.facultyCode ?? "",
+          },
+        },
+      });
+
+      setSubmitting(false);
+
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      if (data.user && !data.session) {
+        setErrorMessage("Акаунт створено! Перевірте пошту для підтвердження реєстрації.");
+        return;
+      }
+
+      if (data.session) {
+        try {
+          await supabase.functions.invoke("set-user-role", { body: { role: roleValue } });
+        } catch {
+          // Edge Function недоступна — роль зберігається в user_metadata
+        }
+
+        const teacherCode = `V${Date.now().toString(36).toUpperCase()}`.slice(0, 10);
+        let teacherPayload: Record<string, unknown> = {
+          "Код_викладача": teacherCode,
+          "ПІБ": fullName,
+          "Email_викладача": formData.email.trim(),
+          "Телефон_викладача": formData.phone,
+        };
+
+        if (selectedRole === "teacher") {
+          teacherPayload = {
+            ...teacherPayload,
+            "Науковий_ступінь": teacherData.degree,
+            "Вчене_звання": teacherData.title,
+          };
+        } else if (selectedRole === "head") {
+          teacherPayload = {
+            ...teacherPayload,
+            "Науковий_ступінь": headData.degree,
+            "Вчене_звання": headData.title,
+          };
+        } else if (selectedRole === "lab") {
+          teacherPayload = {
+            ...teacherPayload,
+            "Науковий_ступінь": "",
+            "Вчене_звання": "",
+          };
+        }
+
+        const { error: dbError } = await supabase.from("Викладач").upsert(teacherPayload, { onConflict: "Код_викладача" });
+        if (dbError) {
+          console.error("Помилка збереження профілю в БД:", dbError.message);
+        }
+
+        const displayRole = roleValue === "laborant" ? "Лаборант" : roleValue === "teacher" ? "Викладач" : "Завідувач кафедри";
+        localStorage.setItem("userRole", displayRole);
+        localStorage.setItem("userDisplayName", fullName);
+        localStorage.setItem("userEmail", formData.email.trim());
+        navigate("/dashboard");
+      }
+    }
+  };
 
   const handleBack = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
@@ -309,41 +443,38 @@ function Register() {
                   <h3>Додаткові дані для викладача</h3>
                   <div className="form-two-columns-layout">
                     <div className="form-vertical-column">
-                      <div className="form-input-group custom-select-box">
-                        <label>Науковий ступінь</label>
-                        <select value={teacherData.degree} onChange={(e) => setTeacherData({...teacherData, degree: e.target.value})}>
-                          <option value="Обрати ступінь">Обрати ступінь</option>
-                          <option value="Доктор філософії (PhD)">Доктор філософії (PhD)</option>
-                          <option value="Доктор наук">Доктор наук</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Вчене звання</label>
-                        <select value={teacherData.title} onChange={(e) => setTeacherData({...teacherData, title: e.target.value})}>
-                          <option value="Обрати звання">Обрати звання</option>
-                          <option value="Доцент">Доцент</option>
-                          <option value="Професор">Професор</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Посада</label>
-                        <select value={teacherData.position} onChange={(e) => setTeacherData({...teacherData, position: e.target.value})}>
-                          <option value="Обрати посаду">Обрати посаду</option>
-                          <option value="Доцент">Доцент</option>
-                          <option value="Професор">Професор</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Кафедра <span className="required-star">*</span></label>
-                        <div className="search-input-field-wrapper">
-                          <FaSearch className="inner-search-icon" />
-                          <input type="text" value={teacherData.department} onChange={(e) => setTeacherData({...teacherData, department: e.target.value})} placeholder="Почніть вводити назву кафедри..." />
-                          <FaChevronDown className="select-dropdown-arrow" />
-                        </div>
-                      </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Науковий ступінь</label>
+                          <select value={teacherData.degree} onChange={(e) => setTeacherData({...teacherData, degree: e.target.value})}>
+                            <option value="">Оберіть ступінь</option>
+                            {degrees.map((d) => <option key={d.code} value={d.name}>{d.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Вчене звання</label>
+                          <select value={teacherData.title} onChange={(e) => setTeacherData({...teacherData, title: e.target.value})}>
+                            <option value="">Оберіть звання</option>
+                            {titles.map((t) => <option key={t.code} value={t.name}>{t.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Посада</label>
+                          <select value={teacherData.position} onChange={(e) => setTeacherData({...teacherData, position: e.target.value})}>
+                            <option value="">Оберіть посаду</option>
+                            {positions.map((p) => <option key={p.code} value={p.name}>{p.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Кафедра <span className="required-star">*</span></label>
+                          <select value={teacherData.department} onChange={(e) => setTeacherData({...teacherData, department: e.target.value})}>
+                            <option value="">Оберіть кафедру</option>
+                            {departments.map((d) => <option key={d.code} value={d.code}>{d.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
 
                       <div className="form-grid-inner-two">
   <div className="form-input-group">
@@ -379,24 +510,23 @@ function Register() {
                     </div>
 
                     <div className="form-vertical-column">
-                      <div className="form-input-group">
-                        <label>Дисципліни, які викладає</label>
-                        <div className="search-input-field-wrapper margin-b-10">
-                          <FaSearch className="inner-search-icon" />
-                          <input type="text" placeholder="Пошук дисциплін..." />
-                        </div>
-                        <div className="checkboxes-scrollable-container">
-                          {["Бази даних", "Об'єктно-орієнтоване програмування", "Вебтехнології", "Інформаційні системи", "Комп'ютерні мережі", "Алгоритми та структури даних"].map((disc) => (
-                            <label key={disc} className="checkbox-row-element">
-                              <input type="checkbox" defaultChecked={["Бази даних", "Об'єктно-орієнтоване програмування", "Вебтехнології", "Інформаційні системи"].includes(disc)} />
-                              <span className="checkbox-label-title">{disc}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <button type="button" className="btn-add-item-action">
-                          <FaPlus /> Додати дисципліну
-                        </button>
-                      </div>
+                        <div className="form-input-group">
+                          <label>Дисципліни, які викладає</label>
+                          <div className="search-input-field-wrapper margin-b-10">
+                            <FaSearch className="inner-search-icon" />
+                            <input type="text" placeholder="Пошук дисциплін..." />
+                          </div>
+                          <div className="checkboxes-scrollable-container">
+                            {disciplines.length > 0 ? disciplines.map((disc) => (
+                              <label key={disc.code} className="checkbox-row-element">
+                                <input type="checkbox" value={disc.code} />
+                                <span className="checkbox-label-title">{disc.name}</span>
+                              </label>
+                            )) : (
+                              <p className="department-empty">Дисципліни не знайдено</p>
+                            )}
+                          </div>
+                        </div>
 
                       <div className="inner-contacts-card-wrapper">
                         <label className="inner-card-header-label">Контактна інформація</label>
@@ -421,14 +551,14 @@ function Register() {
                   <h3>Додаткові дані для лаборанта</h3>
                   <div className="form-two-columns-layout">
                     <div className="form-vertical-column">
-                      <div className="form-input-group custom-select-box">
-                        <label>Кафедра <span className="required-star">*</span></label>
-                        <div className="search-input-field-wrapper">
-                          <FaSearch className="inner-search-icon" />
-                          <input type="text" value={labData.department} onChange={(e) => setLabData({...labData, department: e.target.value})} />
-                          <FaChevronDown className="select-dropdown-arrow" />
-                        </div>
-                      </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Кафедра <span className="required-star">*</span></label>
+                          <select value={labData.department} onChange={(e) => setLabData({...labData, department: e.target.value})}>
+                            <option value="">Оберіть кафедру</option>
+                            {departments.map((d) => <option key={d.code} value={d.code}>{d.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
                       <div className="form-input-group custom-select-box">
                         <label>Лабораторія <span className="required-star">*</span></label>
                         <select value={labData.laboratory} onChange={(e) => setLabData({...labData, laboratory: e.target.value})}>
@@ -474,34 +604,38 @@ function Register() {
                   <h3>Додаткові дані для завідувача кафедри</h3>
                   <div className="form-two-columns-layout">
                     <div className="form-vertical-column">
-                      <div className="form-input-group custom-select-box">
-                        <label>Кафедра <span className="required-star">*</span></label>
-                        <select value={headData.department} onChange={(e) => setHeadData({...headData, department: e.target.value})}>
-                          <option value="Кафедра інформаційних систем та технологій">Кафедра інформаційних систем та технологій</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Факультет / ННІ <span className="required-star">*</span></label>
-                        <select value={headData.faculty} onChange={(e) => setHeadData({...headData, faculty: e.target.value})}>
-                          <option value="Факультет інформаційних технологій">Факультет інформаційних технологій</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Науковий ступінь</label>
-                        <select value={headData.degree} onChange={(e) => setHeadData({...headData, degree: e.target.value})}>
-                          <option value="Доктор філософії (PhD)">Доктор філософії (PhD)</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
-                      <div className="form-input-group custom-select-box">
-                        <label>Вчене звання</label>
-                        <select value={headData.title} onChange={(e) => setHeadData({...headData, title: e.target.value})}>
-                          <option value="Доцент">Доцент</option>
-                        </select>
-                        <FaChevronDown className="select-dropdown-arrow" />
-                      </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Кафедра <span className="required-star">*</span></label>
+                          <select value={headData.department} onChange={(e) => { const department = departments.find((item) => item.code === e.target.value); setHeadData({ ...headData, department: e.target.value, faculty: department?.facultyCode ?? "" }); }}>
+                            <option value="">Оберіть кафедру</option>
+                            {departments.map((d) => <option key={d.code} value={d.code}>{d.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Факультет / ННІ <span className="required-star">*</span></label>
+                          <select value={headData.faculty} onChange={(e) => setHeadData({...headData, faculty: e.target.value})}>
+                            <option value="">Оберіть факультет</option>
+                            {faculties.map((f) => <option key={f.code} value={f.code}>{f.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Науковий ступінь</label>
+                          <select value={headData.degree} onChange={(e) => setHeadData({...headData, degree: e.target.value})}>
+                            <option value="">Оберіть ступінь</option>
+                            {degrees.map((d) => <option key={d.code} value={d.name}>{d.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
+                        <div className="form-input-group custom-select-box">
+                          <label>Вчене звання</label>
+                          <select value={headData.title} onChange={(e) => setHeadData({...headData, title: e.target.value})}>
+                            <option value="">Оберіть звання</option>
+                            {titles.map((t) => <option key={t.code} value={t.name}>{t.name}</option>)}
+                          </select>
+                          <FaChevronDown className="select-dropdown-arrow" />
+                        </div>
                       <div className="form-input-group">
                         <label>Робочий телефон <span className="required-star">*</span></label>
                         <input type="text" value={headData.workPhone} onChange={(e) => setHeadData({...headData, workPhone: e.target.value})} />
@@ -621,8 +755,8 @@ function Register() {
                 <div className="preview-data-grid-two-cols">
                   {selectedRole === "head" && (
                     <>
-                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{headData.department}</span></div>
-                      <div className="info-data-row"><span className="data-key-label">Факультет</span><span className="data-val-text">{headData.faculty}</span></div>
+                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{departments.find((item) => item.code === headData.department)?.name || "—"}</span></div>
+                      <div className="info-data-row"><span className="data-key-label">Факультет</span><span className="data-val-text">{faculties.find((item) => item.code === headData.faculty)?.name || "—"}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Науковий ступінь</span><span className="data-val-text">{headData.degree}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Вчене звання</span><span className="data-val-text">{headData.title}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Робочий телефон</span><span className="data-val-text">{headData.workPhone}</span></div>
@@ -631,7 +765,7 @@ function Register() {
                   )}
                   {selectedRole === "teacher" && (
                     <>
-                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{teacherData.department}</span></div>
+                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{departments.find((item) => item.code === teacherData.department)?.name || "—"}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Посада</span><span className="data-val-text">{teacherData.position}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Ставка</span><span className="data-val-text">{teacherData.rate}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Кабінет</span><span className="data-val-text">{teacherData.office}</span></div>
@@ -639,7 +773,7 @@ function Register() {
                   )}
                   {selectedRole === "lab" && (
                     <>
-                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{labData.department}</span></div>
+                      <div className="info-data-row"><span className="data-key-label">Кафедра</span><span className="data-val-text">{departments.find((item) => item.code === labData.department)?.name || "—"}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Лабораторія</span><span className="data-val-text">{labData.laboratory}</span></div>
                       <div className="info-data-row"><span className="data-key-label">Робочий телефон</span><span className="data-val-text">{labData.workPhone}</span></div>
                     </>
@@ -679,16 +813,16 @@ function Register() {
                 </button>
               )}
             </div>
-            <div className="right-footer-actions">
-              <button className="btn-action-cancel" type="button" onClick={() => navigate("/")}>Скасувати</button>
-              <button className="btn-action-continue" type="button" onClick={handleContinue}>
-                {currentStep === 4 ? (
-                  <>Створити акаунт <FaUserPlus /></>
-                ) : (
-                  <>Продовжити <FaArrowRight /></>
-                )}
-              </button>
-            </div>
+      <div className="right-footer-actions">
+        <button className="btn-action-cancel" type="button" onClick={() => navigate("/")}>Скасувати</button>
+        <button className="btn-action-continue" type="button" onClick={handleContinue} disabled={submitting}>
+          {currentStep === 4 ? (
+            submitting ? "Створення…" : <>Створити акаунт <FaUserPlus /></>
+          ) : (
+            <>Продовжити <FaArrowRight /></>
+          )}
+        </button>
+      </div>
           </footer>
         </main>
       </div>

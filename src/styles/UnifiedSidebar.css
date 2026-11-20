@@ -79,3 +79,222 @@
   .teacher-workspace .teacher-sidebar,
   .app-sidebar { width:62px !important; flex-basis:62px !important; padding:10px 7px !important; }
 }
+
+/* Compact, readable brand, navigation and account controls for the shared sidebar. */
+.app-sidebar-brand {
+  min-height: 82px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 5px 2px 13px !important;
+}
+.app-sidebar-brand img {
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px;
+}
+.app-sidebar-brand-copy { min-width: 0; flex: 1; }
+.app-sidebar-brand-copy b {
+  display: block;
+  margin-bottom: 2px;
+  color: #fff !important;
+  font-size: 16px !important;
+  line-height: 1.2;
+}
+.app-sidebar-brand-copy small {
+  display: block;
+  max-width: 100%;
+  margin-top: 2px !important;
+  overflow: visible;
+  color: #cbd5e1 !important;
+  font-size: 12.5px !important;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: normal;
+  text-overflow: clip;
+  white-space: normal;
+}
+.app-sidebar-brand-copy .app-sidebar-faculty {
+  color: #94a3b8 !important;
+  font-size: 11.5px !important;
+}
+.app-sidebar-nav {
+  gap: 4px !important;
+  margin-top: 14px !important;
+}
+.app-sidebar-nav > .app-sidebar-section-label {
+  margin: 14px 12px 6px !important;
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1.2;
+}
+.app-sidebar-nav > button {
+  min-height: 40px;
+  gap: 10px !important;
+  padding: 9px 12px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+}
+.app-sidebar-nav > button > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+}
+.app-sidebar-nav > button > span {
+  min-width: 0;
+  margin: 0 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+.app-sidebar-footer { margin-top: auto; padding-top: 14px; }
+.app-sidebar-user {
+  min-width: 0;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 10px 9px !important;
+  gap: 8px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 12px;
+  background: rgba(255,255,255,.05);
+}
+.app-sidebar-avatar {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #1e293b;
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 700;
+}
+.app-sidebar-user-copy { min-width: 0; flex: 1; }
+.app-sidebar-user-copy b {
+  display: block;
+  overflow: hidden;
+  color: #f8fafc !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-sidebar-user-copy small {
+  display: block;
+  margin-top: 2px !important;
+  color: #94a3b8 !important;
+  font-size: 11.5px !important;
+  line-height: 1.2;
+}
+.app-sidebar-logout {
+  display: inline-flex !important;
+  width: 32px !important;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px !important;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #94a3b8 !important;
+  cursor: pointer;
+}
+.app-sidebar-logout svg { width: 16px; height: 16px; }
+.app-sidebar-logout:hover { background: rgba(239,68,68,.2) !important; color: #fca5a5 !important; }
+
+@media (max-width: 900px) {
+  .app-sidebar-brand-copy { display: none; }
+  .app-sidebar-brand { justify-content: center !important; padding-inline: 0 !important; }
+  .app-sidebar-nav > button { justify-content: center; padding: 10px 8px !important; }
+  .app-sidebar-nav > button > span { display: none; }
+  .app-sidebar-footer { padding-top: 10px; }
+  .app-sidebar-user { justify-content: center; padding: 8px 4px !important; }
+  .app-sidebar-user-copy { display: none; }
+  .app-sidebar-logout { width: 28px !important; min-width: 28px; height: 28px; min-height: 28px !important; flex-basis: 28px; }
+}
+
+/* Keep the shared navigation rail the same width across all routes and viewports. */
+.app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  transform: none !important;
+  flex: 0 0 240px !important;
+  flex-shrink: 0 !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 100 !important;
+}
+
+/* Sticky navigation needs a non-scrolling layout ancestor; page content owns the document scroll. */
+.dashboard-container,
+.teacher-workspace {
+  display: flex;
+  min-height: 100vh;
+  height: auto !important;
+  overflow: visible !important;
+  align-items: stretch;
+}
+.dashboard-container > .main-content,
+.teacher-workspace > .teacher-main {
+  flex: 1 1 0%;
+  min-width: 0;
+  height: auto !important;
+  min-height: 100vh;
+  overflow: visible !important;
+}
+.app-sidebar-footer { margin-top: auto !important; }
+
+/* Keep the navigation rail viewport-fixed even when a page has nested scrollers. */
+.app-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  transform: none !important;
+  flex: 0 0 240px !important;
+  z-index: 100 !important;
+  overflow-y: auto !important;
+}
+
+.app-shell,
+.dashboard-container:not(.workload-fullscreen-shell),
+.teacher-workspace {
+  padding-left: 240px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell-main,
+.dashboard-container:not(.workload-fullscreen-shell) > .main-content,
+.teacher-workspace > .teacher-main {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  flex: 1 1 0% !important;
+}
+
+.workload-fullscreen-shell { padding-left: 0 !important; }

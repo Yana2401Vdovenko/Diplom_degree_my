@@ -3,18 +3,20 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiBookOpen, FiEdit2, FiPlus, FiRefreshCw } from "react-icons/fi";
 import { supabase } from "../utils/supabaseClient";
+import { ensureCurrentUserDepartment } from "../utils/currentDepartment";
+import { notify } from "../utils/notifications";
 import AppSidebar from "../components/AppSidebar";
 import "../styles/DisciplinesManager.css";
 
 type Discipline = { code: string; name: string; departmentCode: string };
 type FormState = { code: string; name: string; departmentCode: string };
-const emptyForm: FormState = { code: "", name: "", departmentCode: "15.03" };
+const emptyForm: FormState = { code: "", name: "", departmentCode: "" };
 
 function mapDiscipline(row: Record<string, unknown>): Discipline {
   return {
-    code: String(row["Код_дисципліни"] ?? ""),
-    name: String(row["Назва_дисципліни"] ?? ""),
-    departmentCode: String(row["Код_кафедри"] ?? ""),
+    code: String(row["Код_дисципліни"] ?? "").trim(),
+    name: String(row["Назва_дисципліни"] ?? "").trim(),
+    departmentCode: String(row["Код_кафедри"] ?? "").trim(),
   };
 }
 
@@ -25,16 +27,24 @@ export default function Disciplines() {
   const [items, setItems] = useState<Discipline[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [notice, setNotice] = useState("");
+  const setNotice = (message: string) => { if (message.trim()) notify(message, /не вдалося|помил|не дозволив/i.test(message) ? "error" : /збережено|додано/i.test(message) ? "success" : "info", "Дисципліни"); };
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingCode, setEditingCode] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [departmentCode, setDepartmentCode] = useState("");
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("Дисципліни").select("*").order("Назва_дисципліни");
+    const { data: authData } = await supabase.auth.getUser();
+    let currentDepartment = "";
+    try { currentDepartment = (await ensureCurrentUserDepartment(authData.user)).departmentCode; }
+    catch (error) { setNotice(`Не вдалося визначити кафедру користувача: ${error instanceof Error ? error.message : "невідома помилка"}`); setLoading(false); return; }
+    if (!currentDepartment) { setNotice("Для цього облікового запису не визначена кафедра."); setLoading(false); return; }
+    setDepartmentCode(currentDepartment);
+    setForm((current) => ({ ...current, departmentCode: currentDepartment }));
+    const { data, error } = await supabase.from("Дисципліни").select("*").eq("Код_кафедри", currentDepartment).order("Назва_дисципліни");
     if (error) setNotice(`Не вдалося завантажити дисципліни: ${error.message}`);
-    else setItems((data ?? []).map((row) => mapDiscipline(row as Record<string, unknown>)));
+    else setItems((data ?? []).map((row) => mapDiscipline(row as Record<string, unknown>)).filter((row) => row.departmentCode.trim() === currentDepartment));
     setLoading(false);
   };
 
@@ -62,7 +72,7 @@ export default function Disciplines() {
     if (!code || !name) { setNotice("Заповніть код і назву дисципліни."); return; }
     if (code.length > 3) { setNotice("Код дисципліни у вашій БД має містити не більше 3 символів."); return; }
     setSaving(true); setNotice("");
-    const payload = { "Код_дисципліни": code, "Назва_дисципліни": name, "Код_кафедри": form.departmentCode.trim() || null };
+    const payload = { "Код_дисципліни": code, "Назва_дисципліни": name, "Код_кафедри": departmentCode.trim() };
     const { error } = await supabase.from("Дисципліни").upsert(payload, { onConflict: "Код_дисципліни" });
     setSaving(false);
     if (error) {
@@ -79,7 +89,6 @@ export default function Disciplines() {
       <div><p>Довідник кафедри</p><h1>Дисципліни</h1><span>Роль: {role}</span></div>
       <button className="dm-secondary" onClick={() => navigate("/workload")}><FiArrowLeft /> До навантаження</button>
     </header>
-    {notice && <div className="dm-notice">{notice}</div>}
     <section className="dm-toolbar">
       <label>Пошук<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Код або назва дисципліни" /></label>
       <button className="dm-secondary" onClick={() => void load()} disabled={loading}><FiRefreshCw /> Оновити</button>
